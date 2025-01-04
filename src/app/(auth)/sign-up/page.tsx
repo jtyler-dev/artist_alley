@@ -4,12 +4,24 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import * as Routes from "@/constants/routes";
 import { SignUpForm } from "./SignUpForm";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
+import { redirect } from "next/navigation";
 
 export const metadata: Metadata = {
   title: "Sign up | Artist Alley",
 };
 
-export default function SignUpPage() {
+export default async function SignUpPage() {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+
+  console.log(session);
+  if (session) {
+    redirect(Routes.DASHBOARD);
+  }
+
   return (
     <main className="flex flex-col h-full justify-center items-center">
       <div>

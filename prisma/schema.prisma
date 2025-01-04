@@ -12,9 +12,10 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
 model User {
   id            String    @id @default(cuid())
-  name          String    @unique
+  name          String
   displayName   String?
   email         String
   emailVerified Boolean
@@ -24,7 +25,10 @@ model User {
   sessions      Session[]
   accounts      Account[]
 
+  username String?
+
   @@unique([email])
+  @@unique([username])
   @@map("user")
 }
 

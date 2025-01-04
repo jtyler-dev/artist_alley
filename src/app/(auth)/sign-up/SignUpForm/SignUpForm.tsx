@@ -18,7 +18,7 @@ import { signUpFormAction } from "./actions";
 export const SignUpForm = () => {
   const formRef = useRef<HTMLFormElement>(null);
 
-  const [formState, formAction] = useActionState(signUpFormAction, {
+  const [formState, formAction, isPending] = useActionState(signUpFormAction, {
     message: undefined,
     fieldErrors: undefined,
   });
@@ -53,20 +53,7 @@ export const SignUpForm = () => {
 
   return (
     <Form {...form}>
-      <form
-        ref={formRef}
-        action={formAction}
-        onSubmit={(evt) => {
-          // this is a custom submit handler that will call the formAction
-          // function with the form data, even if js is disabled
-          // we are basically just overriding the default form submission
-          // and calling the formAction function instead
-          evt.preventDefault();
-          form.handleSubmit(() => {
-            formAction(new FormData(formRef.current!));
-          })(evt);
-        }}
-      >
+      <form ref={formRef} action={formAction}>
         <div className="flex flex-col gap-4">
           <FormField
             control={form.control}
@@ -113,7 +100,9 @@ export const SignUpForm = () => {
               {formState.message}
             </div>
           )}
-          <Button type="submit">Sign Up</Button>
+          <Button type="submit" disabled={isPending}>
+            Sign Up
+          </Button>
         </div>
       </form>
     </Form>

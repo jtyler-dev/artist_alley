@@ -56,7 +56,7 @@ export async function signUpFormAction(
 
     // Check if user already exists
     const existingUser = await prisma.user.findUnique({
-      where: { name: parsed.data.username },
+      where: { username: parsed.data.username },
     });
 
     if (existingUser) {
@@ -67,15 +67,28 @@ export async function signUpFormAction(
     }
 
     // if the user name and email are not in use, create the user
-    const ret = await auth.api.signUpEmail({
+    const res = await auth.api.signUpEmail({
       body: {
         email: parsed.data.email,
         password: parsed.data.password,
         name: parsed.data.username,
+        username: parsed.data.username,
       },
+      asResponse: true,
     });
 
-    console.log("Signup response:", ret);
+    console.log("Signup response:", res);
+
+    if (res.status !== 200) {
+      console.log("Signup response:", res);
+      console.error("Signup error:");
+
+      return {
+        success: false,
+        message: "An error occurred during sign up. Please try again later.",
+        fields,
+      };
+    }
 
     return {
       success: true,
