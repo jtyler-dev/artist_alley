@@ -3,39 +3,31 @@ import { Metadata } from "next";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import * as Routes from "@/constants/routes";
-import { SignInForm } from "./SignInForm";
+import { SignUpForm } from "./SignUpForm";
 
 export const metadata: Metadata = {
-  title: "Sign in | Artist Alley",
+  title: "Sign up | Artist Alley",
 };
 
-export default function SignInPage() {
+export default function SignUpPage() {
   return (
     <main className="flex flex-col h-full justify-center items-center">
       <div>
         <h2 className="text-2xl font-bold leading-9 tracking-tight text-gray-900">
-          Sign in
+          Sign up
         </h2>
       </div>
       <div className="mt-10">
         <div>
-          <SignInForm />
+          <SignUpForm />
         </div>
-        <p className="mt-2 text-sm leading-6 text-gray-500 flex justify-center">
-          <Link
-            href={Routes.FORGOT_PASSWORD}
-            className="font-semibold text-indigo-600 hover:text-indigo-500"
-          >
-            Forgot your password?
-          </Link>
-        </p>
         <p className="mt-2 text-sm leading-6 text-gray-500">
-          Don&apos;t have an account?{" "}
+          already have an account?{" "}
           <Link
-            href={Routes.SIGN_UP}
+            href={Routes.SIGN_IN}
             className="font-semibold text-indigo-600 hover:text-indigo-500"
           >
-            Sign up
+            Sign in
           </Link>
         </p>
         <div className="mt-10">

@@ -1,0 +1,14 @@
+// Docs
+https://lucide.dev/
+https://www.better-auth.com/
+https://nextjs.org/
+https://www.mailgun.com/
+https://react.email/docs/introduction
+
+
+// nextjs + zod + react-form-hook
+https://medium.com/@ctrlaltmonique/how-to-use-react-hook-form-zod-with-next-js-server-actions-437aaca3d72d
+
+// ui components
+// Tag input (needs react 19 support maybe)
+https://emblor.jaleelbennett.com/introduction

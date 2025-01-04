@@ -1,6 +1,7 @@
 import { betterFetch } from "@better-fetch/fetch";
 import type { auth } from "@/lib/auth";
 import { NextResponse, type NextRequest } from "next/server";
+import * as Routes from "@/constants/routes";
 
 type Session = typeof auth.$Infer.Session;
 
@@ -17,7 +18,7 @@ export default async function authMiddleware(request: NextRequest) {
   );
 
   if (!session) {
-    return NextResponse.redirect(new URL("/sign-in", request.url));
+    return NextResponse.redirect(new URL(Routes.SIGN_UP, request.url));
   }
 
   return NextResponse.next();
