@@ -17,7 +17,6 @@ export default async function SignUpPage() {
     headers: await headers(),
   });
 
-  console.log(session);
   if (session) {
     redirect(Routes.DASHBOARD);
   }

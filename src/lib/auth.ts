@@ -3,7 +3,12 @@ import { prismaAdapter } from "better-auth/adapters/prisma";
 import { prisma } from "./prisma";
 import { nextCookies } from "better-auth/next-js";
 import { username } from "better-auth/plugins";
-import { sendEmail, EmailTypes, EmailVerficiationTemplate } from "@/lib/email";
+import {
+  sendEmail,
+  EmailTypes,
+  EmailVerficiationTemplate,
+  PasswordResetTemplate,
+} from "@/lib/email";
 
 export const auth = betterAuth({
   database: prismaAdapter(prisma, {
@@ -11,11 +16,20 @@ export const auth = betterAuth({
   }),
   emailAndPassword: {
     enabled: true,
+    sendResetPassword: async ({ user, url }) => {
+      await sendEmail(
+        EmailTypes.PASSWORD_RESET,
+        user.email,
+        "Password Reset Request",
+        PasswordResetTemplate({ url, userName: user.name, email: user.email }),
+        `Password reset link for ${user.email}: ${url}`
+      );
+    },
   },
   emailVerification: {
     requireEmailVerification: true, // require email verification, as of right now it doesnt do anything with the username plugin
     sendOnSignUp: true,
-    async sendVerificationEmail({ user, url }) {
+    sendVerificationEmail: async ({ user, url }) => {
       await sendEmail(
         EmailTypes.VERIFY_EMAIL,
         user.email,
