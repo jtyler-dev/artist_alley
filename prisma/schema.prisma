@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -13,10 +7,33 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum CommissionStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+  IN_PROGRESS
+  PAUSED_IN_PROGRESS
+  AWAITING_APPROVAL
+  REVISION_REQUESTED
+  AWAITING_PAYMENT
+  FINISHED
+  ARCHIVED
+}
+
+enum FormFieldType {
+  TEXT         
+  CHECKBOX     
+  RADIO         
+  MULTI_SELECT  
+  NUMBER        
+  DATE         
+}
+
 model User {
+  // most fields are from better-auth
   id            String    @id @default(cuid())
   name          String
-  displayName   String?
+  displayName   String? // custom field: display name
   email         String
   emailVerified Boolean
   image         String?
@@ -25,13 +42,58 @@ model User {
   sessions      Session[]
   accounts      Account[]
 
-  username String?
+  username      String? // from username plugin
+
+  // custom fields for the user
+  isLocked      Boolean?  @default(false) @map("is_locked")
+  bio           String?
+  links         Json[]
+
+  userInfo       UserInfo?
+
+  // who the user is following / has following
+  followers    Follower[]    @relation("UserFollowers")
+  following    Follower[]    @relation("UserFollowing")
+
+  // documents tha the user has created
+  documents    Documents[]
+  forms        Form[]
+  formFields   FormField[]
+
+  // commission creation things
+  commissionGroups CommissionGroup[]
+  commissionTypes  CommissionType[]
+  commissionAddOns CommissionAddOn[]
+
+  // commission requests
+  commissionList        CommissionRequest[]    @relation("commissionCommissioner")
+  commissionRequested   CommissionRequest[]    @relation("commissionClient")
+  commissionMessages    CommissionRequestMessage[]
+
+  formResponses FormResponse[]
 
   @@unique([email])
   @@unique([username])
   @@map("user")
 }
 
+model UserInfo {
+  id        String    @id @default(cuid())
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  userId      String   @unique
+  user        User     @relation(fields: [userId], references: [id])
+
+  defaultCurrency String? @map("default_currency") @default("USD")
+  defaultLanguage String? @map("default_language") @default("en")
+  location        String?
+
+  @@map("profile")
+}
+
+// from better-auth
 model Session {
   id        String   @id @default(cuid())
   expiresAt DateTime
@@ -47,6 +109,8 @@ model Session {
   @@map("session")
 }
 
+
+// from better-auth
 model Account {
   id                    String    @id @default(cuid())
   accountId             String
@@ -66,6 +130,8 @@ model Account {
   @@map("account")
 }
 
+
+// from better-auth
 model Verification {
   id         String    @id @default(cuid())
   identifier String
@@ -75,4 +141,241 @@ model Verification {
   updatedAt  DateTime?
 
   @@map("verification")
+}
+
+model Follower {
+  id        String    @id @default(cuid())
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  followerId  String
+  followingId String
+
+  follower    User     @relation("UserFollowing", fields: [followerId], references: [id])
+  following   User     @relation("UserFollowers", fields: [followingId], references: [id])
+
+  @@unique([followerId, followingId])
+  @@map("follower")
+}
+
+model Documents {
+  id        String    @id @default(cuid())
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+
+  // name of the document
+  name        String
+  // description of the document 
+  description String?
+  // content of the document, most likely markdown
+  content     String
+
+  @@map("documents")
+}
+
+model CommissionGroup {
+  id        String    @id @default(cuid())
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+
+  name        String
+  description String?
+
+  CommissionTypes CommissionType[]
+
+  @@map("commission_group")
+}
+
+model CommissionType {
+  id        String    @id @default(cuid())
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+
+  // metadata for a commission type
+  isActive Boolean @default(false) @map("is_active")
+  activeAt DateTime? @map("active_at")
+  deactivateAt DateTime? @map("deactivate_at")
+  
+  // number of slots available for this commission type, if null then its unlimited
+  numberOfSlots Int? @map("number_of_slots")
+
+  // if its part of a group of commission types
+  commissionGroupId String
+  commissionGroup    CommissionGroup @relation(fields: [commissionGroupId], references: [id])
+
+  formId      String?
+  form        Form?     @relation(fields: [formId], references: [id])
+
+  // details of the commission type
+  name        String
+  description String?
+  details     String
+  price       Float
+  currency    String
+
+  // additional add ons for this commission type
+  commissionAddOns CommissionAddOn[]
+
+  // requests for this commission type
+  commissionRequests CommissionRequest[]
+
+  @@map("commission_type")
+}
+
+model CommissionAddOn {
+  id        String    @id @default(cuid())
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+
+  // metadata for a commission add on
+  isActive Boolean @default(false) @map("is_active")
+  activeAt DateTime? @map("active_at")
+  deactivateAt DateTime? @map("deactivate_at")
+
+  commissionTypes    CommissionType[]
+
+  name        String
+  description String?
+  details     String
+  price       Float?
+  currency    String?
+
+  @@map("commission_add_on")
+}
+
+model CommissionRequest {
+  id        String    @id @default(cuid())
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  // commission type that this request is for
+  commissionTypeId String
+  commissionType    CommissionType @relation(fields: [commissionTypeId], references: [id])
+
+  // person who will do the commission
+  commissioner   User   @relation("commissionCommissioner", fields: [commissionerId], references: [id])
+  commissionerId String
+
+  // person who requested the commission
+  client   User   @relation("commissionClient", fields: [clientId], references: [id])
+  clientId String
+
+  // metadata for a commission request
+  status      CommissionStatus
+  estPrice    Float? @map("est_price")
+
+
+  details     String
+
+  // form responses for this commission request
+  formResponses FormResponse[]
+
+  messages   CommissionRequestMessage[]
+
+  @@map("commission_request")
+}
+
+model CommissionRequestMessage {
+  id        String    @id @default(cuid())
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  // author of the message
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+
+  // commission request that this message is for
+  commissionRequestId String
+  commissionRequest    CommissionRequest @relation(fields: [commissionRequestId], references: [id])
+
+  // when the message was seen by the user
+  messageSeenAt DateTime? @map("message_seen_at")
+
+  message     String
+
+  // TODO: add attachments
+  // TODO: add read status
+  // TODO: add reactions
+  // TODO: add reply to a message like in slack
+
+  @@map("commission_request_message")
+}
+
+model Form {
+  id        String    @id @default(cuid())
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  // author of the form
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  // attached fields to the form
+  formFields  FormField[]
+
+  // commission types that this form is attached to
+  commissionTypes CommissionType[]
+}
+
+model FormField {
+  id          String    @id @default(cuid())
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+  deletedAt   DateTime? @map("deleted_at")
+
+  // author of the form field
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+
+  formId      String
+  form        Form     @relation(fields: [formId], references: [id])
+
+  order       Int
+  isRequired  Boolean @default(false) @map("is_required")
+  label       String  // label or question for the form field ie: "What is your name?"
+  type        FormFieldType
+  options     String? @default("[]") // options for the form field, only used for radio, checkbox, and multi-select
+
+  responses  FormResponse[]
+  @@map("form_field")
+}
+
+model FormResponse {
+  id        String    @id @default(cuid())
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+ 
+  // form field that this response is for
+  formFieldId  String @map("form_field_id")
+  formField    FormField @relation(fields: [formFieldId], references: [id]) 
+
+  // author of the response
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+
+  commissionRequestId String
+  commissionRequest    CommissionRequest @relation(fields: [commissionRequestId], references: [id])
+
+  // response to the form field
+  value       String
 }

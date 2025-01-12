@@ -2,7 +2,7 @@
 import { auth } from "@/lib/auth";
 import { SignUpFormSchema } from "./SignUpFormSchema";
 import { ActionFormState } from "@/types/ActionFormState";
-import { prisma } from "@/lib/prisma";
+import { prisma } from "@/lib/prisma/prisma";
 
 type SignUpActionFormStateFieldsErrors = {
   email?: string[] | undefined;
