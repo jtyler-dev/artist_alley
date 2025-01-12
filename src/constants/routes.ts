@@ -8,3 +8,12 @@ export const RESET_PASSWORD = `/reset-password`;
 
 // dashboard
 export const DASHBOARD = "/dashboard";
+
+// home
+export const HOME = "/home";
+
+// studio
+export const STUDIO = "/studio";
+
+// account
+export const ACCOUNT = "/account";

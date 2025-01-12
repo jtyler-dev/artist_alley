@@ -1,6 +1,11 @@
 "use client"; // for testing
 import React from "react";
 import { authClient } from "@/lib/auth-client";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Dashboard | Artist Alley",
+};
 
 export default function DashboardPage() {
   return (
