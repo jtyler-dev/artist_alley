@@ -2,13 +2,13 @@ import React from "react";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Account | Artist Alley",
+  title: "Settings | Artist Alley",
 };
 
-export default function AccountPage() {
+export default function Settings() {
   return (
     <div>
-      <h1>Account</h1>
+      <h1>Settings</h1>
     </div>
   );
 }

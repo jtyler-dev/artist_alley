@@ -26,9 +26,10 @@ export default async function authMiddleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    `${Routes.DASHBOARD}/:path*`,
     `${Routes.HOME}/:path*`,
+    `${Routes.DASHBOARD}/:path*`,
+    `${Routes.COMMISSION}/:path*`,
     `${Routes.STUDIO}/:path*`,
-    `${Routes.ACCOUNT}/:path*`,
+    `${Routes.SETTINGS}/:path*`,
   ],
 };
