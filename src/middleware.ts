@@ -21,15 +21,18 @@ export default async function authMiddleware(request: NextRequest) {
     return NextResponse.redirect(new URL(Routes.SIGN_UP, request.url));
   }
 
+  // TODO: add in admin check here
+
   return NextResponse.next();
 }
 
+// matcher cant be a dynamic string, has to be hardcoded
 export const config = {
   matcher: [
-    `${Routes.HOME}/:path*`,
-    `${Routes.DASHBOARD}/:path*`,
-    `${Routes.COMMISSION}/:path*`,
-    `${Routes.STUDIO}/:path*`,
-    `${Routes.SETTINGS}/:path*`,
+    "/home/:path*",
+    "/dashboard/:path*",
+    "/commission/:path*",
+    "/studio/:path*",
+    "/settings/:path*",
   ],
 };

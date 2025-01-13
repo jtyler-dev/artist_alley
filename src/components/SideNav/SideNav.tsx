@@ -28,10 +28,10 @@ import { authClient } from "@/lib/auth-client";
 export const SideNav = () => {
   const router = useRouter();
   const session = authClient.useSession();
-  authClient.signOut();
 
   return (
-    <aside className="inset-y fixed left-0 z-20 flex h-full flex-col border-r">
+    // <aside className="inset-y fixed left-0 z-20 flex h-full flex-col border-r">
+    <aside className="flex h-full flex-col border-r">
       <LogoButton className="border-b p-2" />
       <nav className="grid gap-1 p-2">
         <SideNavButton

@@ -5,7 +5,7 @@ import { notFound } from "next/navigation";
 
 interface ProfilePageProps {
   params: {
-    userName: string;
+    username: string;
   };
 }
 
@@ -13,16 +13,16 @@ export async function generateMetadata({
   params,
 }: ProfilePageProps): Promise<Metadata> {
   return {
-    title: `${params.userName} | Artist Alley`,
+    title: `${params.username} | Artist Alley`,
   };
 }
 
 export default async function ProfilePage({ params }: ProfilePageProps) {
-  const { userName } = params;
+  const { username } = params;
 
   const user = await prisma.user.findUnique({
     where: {
-      username: userName,
+      username,
     },
   });
 
