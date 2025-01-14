@@ -1,6 +1,6 @@
 import React from "react";
 import { Metadata } from "next";
-import Tiptap from "@/components/TipTap";
+import Tiptap from "@/components/TipTap/TipTap";
 
 export const metadata: Metadata = {
   title: "Home | Artist Alley",
