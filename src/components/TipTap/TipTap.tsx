@@ -11,9 +11,14 @@ import { BasicEditorMenu } from "./BasicEditorMenu";
 export interface TiptapProps {
   initialContent?: Content;
   maxCharacterCount?: number;
+  onChange?: (content: Content) => void;
 }
 
-const Tiptap = ({ initialContent, maxCharacterCount }: TiptapProps) => {
+export const TipTap = ({
+  initialContent,
+  maxCharacterCount,
+  onChange,
+}: TiptapProps) => {
   const editor = useEditor({
     extensions: [
       StarterKit.configure({
@@ -35,6 +40,9 @@ const Tiptap = ({ initialContent, maxCharacterCount }: TiptapProps) => {
       ...(maxCharacterCount ? [CharacterCount.configure({ limit: 500 })] : []),
     ],
     content: initialContent,
+    onUpdate({ editor }) {
+      onChange?.(editor.getJSON());
+    },
   });
 
   return (
@@ -44,5 +52,3 @@ const Tiptap = ({ initialContent, maxCharacterCount }: TiptapProps) => {
     </div>
   );
 };
-
-export default Tiptap;
