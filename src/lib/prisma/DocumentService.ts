@@ -3,7 +3,35 @@ import { PublishedStatus } from "@prisma/client";
 
 export async function getDocumentById(id: string) {
   return await prisma.document.findUnique({
-    where: { id },
+    where: {
+      id,
+      deletedAt: null,
+    },
+    include: {
+      user: true,
+    },
+  });
+}
+
+export async function getAllDocumentsByUserId(userId: string) {
+  return await prisma.document.findMany({
+    where: {
+      userId,
+      deletedAt: null,
+    },
+  });
+}
+
+export async function getDocumentByPublishedStatus(
+  userId: string,
+  status: PublishedStatus
+) {
+  return await prisma.document.findMany({
+    where: {
+      userId,
+      status,
+      deletedAt: null,
+    },
   });
 }
 
@@ -36,10 +64,11 @@ export async function updateDocument(
     richContent?: JSON;
     description?: string;
     status: PublishedStatus;
-  }
+  },
+  userId: string
 ) {
   return await prisma.document.update({
-    where: { id },
+    where: { id, userId },
     data: {
       name: data.name,
       content: data.content,
@@ -49,15 +78,37 @@ export async function updateDocument(
   });
 }
 
-export async function deleteDocument(id: string) {
+export const deleteDocument = async (id: string, userId: string) => {
+  return await prisma.document.update({
+    where: { id, userId },
+    data: {
+      deletedAt: new Date(),
+    },
+  });
+};
+
+export const restoreDocument = async (id: string, userId: string) => {
+  return await prisma.document.update({
+    where: { id, userId },
+    data: {
+      deletedAt: null,
+    },
+  });
+};
+
+export async function hardDeleteDocument(userId: string, documentId: string) {
   return await prisma.document.delete({
-    where: { id },
+    where: { id: documentId, userId },
   });
 }
 
 // TODO: add pagination
-export async function getDocuments() {
+export async function getDocuments(userId: string) {
   return await prisma.document.findMany({
+    where: {
+      userId,
+      deletedAt: null,
+    },
     orderBy: {
       createdAt: "desc",
     },

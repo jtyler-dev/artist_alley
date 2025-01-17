@@ -77,6 +77,9 @@ model User {
 
   formResponses FormResponse[]
 
+  // other things created by a user
+  customReactions CustomReaction[]
+
   @@unique([email])
   @@unique([username])
   @@map("user")
@@ -292,10 +295,9 @@ model CommissionRequest {
   clientId String
 
   // metadata for a commission request
-  status      CommissionStatus
+  status      CommissionStatus @default(PENDING)
   estPrice    Float? @map("est_price")
-
-
+  
   details     String
 
   // form responses for this commission request
@@ -399,4 +401,21 @@ model FormResponse {
 
   // response to the form field
   value       String
+}
+
+
+model CustomReaction {
+  id        String    @id @default(cuid())
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  // author of the reaction
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+
+  name       String
+  // TODO: add associated file
+  // TODO: add who can use it?
+  
 }
