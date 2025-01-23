@@ -1,5 +1,6 @@
 import { prisma } from "./prisma";
 import { PublishedStatus } from "@prisma/client";
+import { DEFAULT_SORT_FIELD, DEFAULT_SORT_ORDER } from "./constants";
 
 // get document by id
 export async function getDocumentById(id: string) {
@@ -14,13 +15,46 @@ export async function getDocumentById(id: string) {
   });
 }
 
-// get all documents by a given user id
-export async function getAllDocumentsByUserId(userId: string) {
+/**
+ * Prisma query to get all documents by a given user id.
+ * If itemsPerPage is not provided, it will return all documents.
+ * If paginationCursor is provided, it will return the next page of documents.
+ *
+ *
+ * @param params - The parameters for the query
+ * @param params.userId - The user ID to filter documents
+ * @param params.paginationCursor - The cursor to paginate the results (ID of the last fetched item)
+ * @param params.itemsPerPage - The number of items per page (default is 50)
+ * @param params.sortField - The field to sort by, defaults to "createdAt"
+ * @param params.sortOrder - The order to sort by, defaults to "desc"
+ * @returns The paginated list of documents
+ */
+export async function getAllDocumentsByUserId({
+  userId,
+  paginationCursor,
+  itemsPerPage,
+  sortField = DEFAULT_SORT_FIELD,
+  sortOrder = DEFAULT_SORT_ORDER,
+}: {
+  userId: string;
+  paginationCursor?: string;
+  itemsPerPage?: number;
+  sortField?: string;
+  sortOrder?: "asc" | "desc";
+}) {
   return await prisma.document.findMany({
     where: {
       userId,
       deletedAt: null,
     },
+    orderBy: {
+      [sortField]: sortOrder,
+    },
+    ...(itemsPerPage && { take: itemsPerPage }),
+    ...(paginationCursor && {
+      cursor: { id: paginationCursor },
+      skip: 1, // Skip the cursor itself to avoid duplicates
+    }),
   });
 }
 
@@ -41,7 +75,7 @@ export async function getDocumentByPublishedStatus(
 export async function createDocument(data: {
   name: string;
   content?: string;
-  richContent?: JSON;
+  richContent?: string;
   description?: string;
   status: PublishedStatus;
   authorId: string;
@@ -50,7 +84,7 @@ export async function createDocument(data: {
     data: {
       name: data.name,
       content: data.content,
-      richContent: JSON.stringify(data.richContent),
+      richContent: data.richContent,
       status: data.status,
       user: {
         connect: { id: data.authorId },
@@ -64,7 +98,7 @@ export async function updateDocument(
   data: {
     name: string;
     content?: string;
-    richContent?: JSON;
+    richContent?: string;
     description?: string;
     status: PublishedStatus;
   },
@@ -75,7 +109,7 @@ export async function updateDocument(
     data: {
       name: data.name,
       content: data.content,
-      richContent: JSON.stringify(data.richContent),
+      richContent: data.richContent,
       status: data.status,
     },
   });

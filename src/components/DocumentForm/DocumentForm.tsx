@@ -33,8 +33,6 @@ export interface DocumentFormProps {
 export const DocumentForm: React.FC<DocumentFormProps> = ({
   action,
   defaultPublishedStatus,
-  onError,
-  onSuccess,
 }) => {
   const [publishedStatus, setPublishedStatus] = useState<PublishedStatus>(
     defaultPublishedStatus ?? PublishedStatus.DRAFT

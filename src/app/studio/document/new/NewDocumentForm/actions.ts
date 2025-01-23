@@ -12,8 +12,7 @@ export async function newDocumentFormAction(
   prevState: DocumentFormState,
   rawFormData: FormData
 ): Promise<DocumentFormState> {
-  console.log("-------newDocumentFormAction-----");
-
+  // we nee to check if the user is logged in, since server actions become real api endpoints
   const session = await auth.api.getSession({
     headers: await headers(),
   });
@@ -27,12 +26,9 @@ export async function newDocumentFormAction(
     };
   }
 
-  console.log(session);
-
   // Convert FormData to object
   const formData = Object.fromEntries(rawFormData);
 
-  console.log(formData);
   // then use zods schema to validate the form data on the server
   const parsed = DocumentFormSchema.safeParse(formData);
 
@@ -54,7 +50,7 @@ export async function newDocumentFormAction(
   try {
     const document = await createDocument({
       name: parsed.data.title,
-      content: parsed.data.content,
+      richContent: parsed.data.content,
       authorId: session.user.id,
       status: PublishedStatus.DRAFT,
     });

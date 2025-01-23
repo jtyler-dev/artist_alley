@@ -189,7 +189,8 @@ model Document {
   content     String?
 
   // content from tip tap editor will be stored as json
-  richContent Json? @map("rich_content")
+  // this will be a stringified json object
+  richContent String? @map("rich_content")
 
   @@map("document")
 }
@@ -350,7 +351,9 @@ model Form {
   description String?
 
   explanation String?
-  explanationRichContent Json? @map("explanation_rich_content")
+
+  // rich content form tip tap editor
+  explanationRichContent String? @map("explanation_rich_content")
 
   // attached fields to the form
   formFields  FormField[]
