@@ -1,6 +1,7 @@
 import { prisma } from "./prisma";
 import { PublishedStatus } from "@prisma/client";
 
+// get document by id
 export async function getDocumentById(id: string) {
   return await prisma.document.findUnique({
     where: {
@@ -13,6 +14,7 @@ export async function getDocumentById(id: string) {
   });
 }
 
+// get all documents by a given user id
 export async function getAllDocumentsByUserId(userId: string) {
   return await prisma.document.findMany({
     where: {
@@ -22,6 +24,7 @@ export async function getAllDocumentsByUserId(userId: string) {
   });
 }
 
+// get all documents by a given user id and published status
 export async function getDocumentByPublishedStatus(
   userId: string,
   status: PublishedStatus

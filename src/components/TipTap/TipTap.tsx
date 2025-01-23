@@ -9,17 +9,14 @@ import TaskList from "@tiptap/extension-task-list";
 import { BasicEditorMenu } from "./BasicEditorMenu";
 
 export interface TiptapProps {
-  initialContent?: Content;
+  value?: Content;
   maxCharacterCount?: number;
-  onChange?: (content: Content) => void;
+  onChange: (value: Content) => void;
 }
 
-export const TipTap = ({
-  initialContent,
-  maxCharacterCount,
-  onChange,
-}: TiptapProps) => {
+export const TipTap = ({ value, maxCharacterCount, onChange }: TiptapProps) => {
   const editor = useEditor({
+    immediatelyRender: true,
     extensions: [
       StarterKit.configure({
         bulletList: {
@@ -39,9 +36,10 @@ export const TipTap = ({
       TaskList,
       ...(maxCharacterCount ? [CharacterCount.configure({ limit: 500 })] : []),
     ],
-    content: initialContent,
+    content: value,
     onUpdate({ editor }) {
-      onChange?.(editor.getJSON());
+      const editorContent = editor.getJSON();
+      onChange(JSON.stringify(editorContent));
     },
   });
 

@@ -2,9 +2,9 @@ import z from "zod";
 import { PublishedStatus } from "@prisma/client";
 
 export const DocumentFormSchema = z.object({
-  title: z.string({ required_error: "Document title is required" }),
-  content: z.string({ required_error: "Document content is required" }),
-  status: z.enum([PublishedStatus.DRAFT, PublishedStatus.PUBLISHED]),
+  title: z.string().min(1, "Document title is required").trim(),
+  content: z.string().min(1, "Document content is required").trim(),
+  status: z.enum([PublishedStatus.DRAFT, PublishedStatus.PUBLISHED]).optional(),
 });
 
 export type DocumentFormSchemaType = z.infer<typeof DocumentFormSchema>;
