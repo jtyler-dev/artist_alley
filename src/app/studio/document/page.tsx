@@ -6,6 +6,9 @@ import { redirect } from "next/navigation";
 import * as Routes from "@/constants/routes";
 import { getAllDocumentsByUserId } from "@/lib/prisma/DocumentService";
 
+import { DocumentTable } from "@/components/table/DocumentTable/DocumentTable";
+import { DocumentTableData } from "@/components/table/DocumentTable/DocumentTableColDef";
+
 export const metadata: Metadata = {
   title: "Documents | Artist Alley",
 };
@@ -26,11 +29,7 @@ export default async function DocumentsPage() {
   return (
     <div>
       <h1>Documents</h1>
-      <ul>
-        {documents.map((document) => (
-          <li key={document.id}>{document.name}</li>
-        ))}
-      </ul>
+      <DocumentTable data={documents as DocumentTableData[]} />
     </div>
   );
 }

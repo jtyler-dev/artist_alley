@@ -34,6 +34,16 @@ enum PublishedStatus {
   PUBLISHED
 }
 
+enum UserRole {
+  USER
+  ADMIN
+}
+
+enum ActiveStatus {
+  ACTIVE
+  INACTIVE
+}
+
 model User {
   // most fields are from better-auth
   id            String    @id @default(cuid())
@@ -225,6 +235,8 @@ model CommissionType {
   isActive Boolean @default(false) @map("is_active")
   activeAt DateTime? @map("active_at")
   deactivateAt DateTime? @map("deactivate_at")
+
+  allowMessages Boolean @default(false) @map("allow_messages")
   
   // number of slots available for this commission type, if null then its unlimited
   numberOfSlots Int? @map("number_of_slots")
@@ -420,5 +432,4 @@ model CustomReaction {
   name       String
   // TODO: add associated file
   // TODO: add who can use it?
-  
 }

@@ -11,12 +11,19 @@ import { BasicEditorMenu } from "./BasicEditorMenu";
 export interface TiptapProps {
   value?: Content;
   maxCharacterCount?: number;
-  onChange: (value: Content) => void;
+  onChange?: (value: Content) => void;
+  isEditable?: boolean;
 }
 
-export const TipTap = ({ value, maxCharacterCount, onChange }: TiptapProps) => {
+export const TipTap = ({
+  value,
+  maxCharacterCount,
+  onChange,
+  isEditable = true,
+}: TiptapProps) => {
   const editor = useEditor({
     immediatelyRender: true,
+    editable: isEditable,
     extensions: [
       StarterKit.configure({
         bulletList: {
@@ -38,6 +45,10 @@ export const TipTap = ({ value, maxCharacterCount, onChange }: TiptapProps) => {
     ],
     content: value,
     onUpdate({ editor }) {
+      if (!onChange) {
+        return;
+      }
+
       const editorContent = editor.getJSON();
       onChange(JSON.stringify(editorContent));
     },
@@ -45,7 +56,7 @@ export const TipTap = ({ value, maxCharacterCount, onChange }: TiptapProps) => {
 
   return (
     <div>
-      <BasicEditorMenu editor={editor} />
+      {isEditable && <BasicEditorMenu editor={editor} />}
       <EditorContent editor={editor} />
     </div>
   );
