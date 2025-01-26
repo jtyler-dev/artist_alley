@@ -21,7 +21,7 @@ export const NewCommissionTypeFormSchema = z.object({
   activeAt: z.date().optional(),
   inactiveAt: z.date().optional(),
   allowMessages: z.boolean().default(false),
-  numberOfSlots: z.number().nullable().optional(),
+  numberOfSlots: z.number().optional(),
   commissionAddOns: z.array(commissionAddOnSchema),
 });
 
