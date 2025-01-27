@@ -7,6 +7,15 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// represents the state of a commission type's request queue
+enum CommissionTypeRequestStatus {
+  DRAFT     // user is still working on the request
+  ACCEPTING // user is accepting requests of this type
+  PAUSED    // user has paused requests of this type
+  FULL      // user has reached the max number of requests for this type
+  CLOSED    // user has closed requests of this type
+}
+
 enum CommissionStatus {
   PENDING
   ACCEPTED
@@ -39,10 +48,6 @@ enum UserRole {
   ADMIN
 }
 
-enum ActiveStatus {
-  ACTIVE
-  INACTIVE
-}
 
 model User {
   // most fields are from better-auth
@@ -198,13 +203,11 @@ model Document {
   // if its a json object then it will be rich content
   content     String?
 
-  // content from tip tap editor will be stored as json
-  // this will be a stringified json object
-  richContent String? @map("rich_content")
-
   @@map("document")
 }
 
+// Model that allows the user to create a group of commission types
+// and group them together, this is just for organization / displaying
 model CommissionGroup {
   id        String    @id @default(cuid())
   createdAt DateTime  @default(now()) @map("created_at")
@@ -228,32 +231,51 @@ model CommissionType {
   updatedAt DateTime  @updatedAt @map("updated_at")
   deletedAt DateTime? @map("deleted_at")
 
+  // status of the commission type
+  status      CommissionTypeRequestStatus @default(DRAFT)
+
+  // who created the commission type
   userId      String
   user        User     @relation(fields: [userId], references: [id])
-
-  // metadata for a commission type
-  isActive Boolean @default(false) @map("is_active")
-  activeAt DateTime? @map("active_at")
-  deactivateAt DateTime? @map("deactivate_at")
-
-  allowMessages Boolean @default(false) @map("allow_messages")
-  
-  // number of slots available for this commission type, if null then its unlimited
-  numberOfSlots Int? @map("number_of_slots")
 
   // if its part of a group of commission types
   commissionGroupId String
   commissionGroup    CommissionGroup @relation(fields: [commissionGroupId], references: [id])
 
-  formId      String?
-  form        Form?     @relation(fields: [formId], references: [id])
-
-  // details of the commission type
+  // core data for a commission type
+  // name of the commission type
   name        String
+
+  // a brief description of the commission type
   description String?
+
+  // details of the commission type, what the user will get if they request this commission
   details     String
+
+  // price information
   price       Float
   currency    String
+
+  // Options for the commission type
+  // if the client is allowed to send messages to the commissioner after the commission is accepted
+  allowMessages Boolean @default(false) @map("allow_messages")
+
+  // ---- slots info ----
+  // number of slots available for this commission type, if undefined then its unlimited
+  numberOfSlots Int? @map("number_of_slots")
+
+  // automatically reopen the commission type if the if the number of active requests is less than the number of slots
+  reopenSlotQueue Boolean @default(false) @map("reopen_slot_queue")
+
+  // if a client is allowed to join a waiting list if the commission type is full
+  allowWaitList Boolean @default(false) @map("allow_wait_list")
+
+  // allows user to set a date and time for when the commission type will open for requests and close for requests
+  openAt DateTime? @map("open_at")
+  closeAt DateTime? @map("close_at")
+
+  formId      String?
+  form        Form?     @relation(fields: [formId], references: [id])
 
   // additional add ons for this commission type
   commissionAddOns CommissionAddOn[]
@@ -274,10 +296,6 @@ model CommissionAddOn {
   user        User     @relation(fields: [userId], references: [id])
 
   // metadata for a commission add on
-  isActive Boolean @default(false) @map("is_active")
-  activeAt DateTime? @map("active_at")
-  deactivateAt DateTime? @map("deactivate_at")
-
   commissionTypes    CommissionType[]
 
   name        String
@@ -363,9 +381,6 @@ model Form {
   description String?
 
   explanation String?
-
-  // rich content form tip tap editor
-  explanationRichContent String? @map("explanation_rich_content")
 
   // attached fields to the form
   formFields  FormField[]

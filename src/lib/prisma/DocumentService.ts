@@ -75,7 +75,6 @@ export async function getDocumentByPublishedStatus(
 export async function createDocument(data: {
   name: string;
   content?: string;
-  richContent?: string;
   description?: string;
   status: PublishedStatus;
   authorId: string;
@@ -84,7 +83,6 @@ export async function createDocument(data: {
     data: {
       name: data.name,
       content: data.content,
-      richContent: data.richContent,
       status: data.status,
       user: {
         connect: { id: data.authorId },
@@ -98,7 +96,6 @@ export async function updateDocument(
   data: {
     name: string;
     content?: string;
-    richContent?: string;
     description?: string;
     status: PublishedStatus;
   },
@@ -109,7 +106,6 @@ export async function updateDocument(
     data: {
       name: data.name,
       content: data.content,
-      richContent: data.richContent,
       status: data.status,
     },
   });

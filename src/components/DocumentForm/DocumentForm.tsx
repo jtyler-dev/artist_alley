@@ -1,5 +1,5 @@
 "use client";
-import React, { useRef, useEffect, useActionState, useState } from "react";
+import React, { useRef, useActionState, useState } from "react";
 import {
   Form,
   FormControl,
@@ -19,6 +19,7 @@ import {
 import { PublishedStatus } from "@prisma/client";
 import { DocumentFormState } from "./types";
 import { ActionButton } from "@/components/ActionButton";
+import { useSetFormFieldErrors } from "@/hooks/useSetFormFieldErrors";
 
 export interface DocumentFormProps {
   action: (
@@ -54,23 +55,11 @@ export const DocumentForm: React.FC<DocumentFormProps> = ({
     },
   });
 
-  // useEffect to populate form fields with data from the server
-  // if the formState.fieldErrors object is provided
-  useEffect(() => {
-    if (formState?.fieldErrors) {
-      // clear any existing errors
-      form.clearErrors();
-      // get the keys of the fields that have errors
-      const keys = Object.keys(formState.fieldErrors);
-      // loop through the keys and set the error message for each field
-      keys.forEach((key) => {
-        const fieldKey = key as keyof typeof formState.fieldErrors;
-        const message =
-          formState.fieldErrors![key as keyof typeof formState.fieldErrors];
-        form.setError(fieldKey, { message: message![0] });
-      });
-    }
-  }, [form, formState?.fieldErrors, formState]);
+  useSetFormFieldErrors({
+    formState,
+    formClearErrors: form.clearErrors,
+    formSetError: form.setError,
+  });
 
   return (
     <Form {...form}>

@@ -50,7 +50,7 @@ export async function newDocumentFormAction(
   try {
     const document = await createDocument({
       name: parsed.data.title,
-      richContent: parsed.data.content,
+      content: parsed.data.content,
       authorId: session.user.id,
       status: PublishedStatus.DRAFT,
     });
