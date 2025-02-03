@@ -1,6 +1,13 @@
-import { prisma } from "./prisma";
+"use server";
+import { prisma } from "@/lib/prisma";
 import { PublishedStatus } from "@prisma/client";
 import { DEFAULT_SORT_FIELD, DEFAULT_SORT_ORDER } from "./constants";
+
+// NOTE: as of 2-2-25 there is a wierd bug in prisma / next where if their is a prisma error it doesnt know how to handle it properly
+// use this to catch the error
+// if (error instanceof Error) {
+//   console.log("Error: ", error.stack);
+// }
 
 // get document by id
 export async function getDocumentById(id: string) {
@@ -42,20 +49,30 @@ export async function getAllDocumentsByUserId({
   sortField?: string;
   sortOrder?: "asc" | "desc";
 }) {
-  return await prisma.document.findMany({
-    where: {
-      userId,
-      deletedAt: null,
-    },
-    orderBy: {
-      [sortField]: sortOrder,
-    },
-    ...(itemsPerPage && { take: itemsPerPage }),
-    ...(paginationCursor && {
-      cursor: { id: paginationCursor },
-      skip: 1, // Skip the cursor itself to avoid duplicates
+  // fetch documents and total count in a single transaction
+  const [documents, totalCount] = await prisma.$transaction([
+    prisma.document.findMany({
+      where: {
+        userId,
+        deletedAt: null,
+      },
+      orderBy: {
+        [sortField]: sortOrder,
+      },
+      ...(itemsPerPage && { take: itemsPerPage }),
+      ...(paginationCursor && {
+        cursor: { id: paginationCursor },
+        skip: 1, // Skip the cursor itself to avoid duplicates
+      }),
     }),
-  });
+    prisma.document.count({
+      where: {
+        userId,
+        deletedAt: null,
+      },
+    }),
+  ]);
+  return { documents: documents || [], totalCount: totalCount ?? 0 }; // Ensure object is always returned
 }
 
 // get all documents by a given user id and published status
