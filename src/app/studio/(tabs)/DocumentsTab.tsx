@@ -13,7 +13,6 @@ export const DocumentsTab = ({ userId }: { userId: string }) => {
   return (
     <div>
       <h1>Documents</h1>
-      <Spinner />
       <DocumentTable data={documents} />
     </div>
   );

@@ -6,14 +6,20 @@ import { redirect } from "next/navigation";
 import * as Routes from "@/constants/routes";
 import { StudioTabs } from "@/constants/StudioTabs";
 import { DocumentsTab } from "./(tabs)/DocumentsTab";
+import { StudioTabControls } from "./(tabs)/StudioTabControls";
 
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsContent } from "@/components/ui/tabs";
 
 export const metadata: Metadata = {
   title: "Studio | Artist Alley",
 };
 
-export default async function StudioPage() {
+export default async function StudioPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ tab?: string }>;
+}) {
+  const { tab = StudioTabs.ACTIVE_QUEUES } = await searchParams;
   const session = await auth.api.getSession({
     headers: await headers(),
   });
@@ -25,17 +31,8 @@ export default async function StudioPage() {
     <main className="flex flex-col gap-4">
       <h1>Studio</h1>
       <div>
-        <Tabs defaultValue={StudioTabs.ACTIVE_QUEUES}>
-          <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value={StudioTabs.ACTIVE_QUEUES}>
-              Active Queues
-            </TabsTrigger>
-            <TabsTrigger value={StudioTabs.COMMISSION_TYPES}>
-              Commission Types
-            </TabsTrigger>
-            <TabsTrigger value={StudioTabs.DOCUMENTS}>Documents</TabsTrigger>
-            <TabsTrigger value={StudioTabs.FORMS}>Forms</TabsTrigger>
-          </TabsList>
+        <Tabs defaultValue={tab}>
+          <StudioTabControls />
           <TabsContent value={StudioTabs.ACTIVE_QUEUES}>
             Active Queues
           </TabsContent>
