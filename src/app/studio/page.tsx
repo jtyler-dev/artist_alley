@@ -28,23 +28,21 @@ export default async function StudioPage({
     redirect(Routes.SIGN_IN);
   }
   return (
-    <main className="flex flex-col gap-4">
+    <main>
       <h1>Studio</h1>
-      <div>
-        <Tabs defaultValue={tab}>
-          <StudioTabControls />
-          <TabsContent value={StudioTabs.ACTIVE_QUEUES}>
-            Active Queues
-          </TabsContent>
-          <TabsContent value={StudioTabs.COMMISSION_TYPES}>
-            Commission Types
-          </TabsContent>
-          <TabsContent value={StudioTabs.DOCUMENTS}>
-            <DocumentsTab userId={session.user.id} />
-          </TabsContent>
-          <TabsContent value={StudioTabs.FORMS}>Forms</TabsContent>
-        </Tabs>
-      </div>
+      <Tabs defaultValue={tab}>
+        <StudioTabControls />
+        <TabsContent value={StudioTabs.ACTIVE_QUEUES}>
+          Active Queues
+        </TabsContent>
+        <TabsContent value={StudioTabs.COMMISSION_TYPES}>
+          Commission Types
+        </TabsContent>
+        <TabsContent value={StudioTabs.DOCUMENTS}>
+          <DocumentsTab userId={session.user.id} />
+        </TabsContent>
+        <TabsContent value={StudioTabs.FORMS}>Forms</TabsContent>
+      </Tabs>
     </main>
   );
 }

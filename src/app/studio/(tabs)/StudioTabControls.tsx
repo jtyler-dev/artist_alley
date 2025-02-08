@@ -17,33 +17,31 @@ export const StudioTabControls = () => {
   };
 
   return (
-    <TabsList>
-      <TabsList className="grid w-full grid-cols-4">
-        <TabsTrigger
-          value={StudioTabs.ACTIVE_QUEUES}
-          onClick={() => onTabClick(StudioTabs.ACTIVE_QUEUES)}
-        >
-          Active Queues
-        </TabsTrigger>
-        <TabsTrigger
-          value={StudioTabs.COMMISSION_TYPES}
-          onClick={() => onTabClick(StudioTabs.COMMISSION_TYPES)}
-        >
-          Commission Types
-        </TabsTrigger>
-        <TabsTrigger
-          value={StudioTabs.DOCUMENTS}
-          onClick={() => onTabClick(StudioTabs.DOCUMENTS)}
-        >
-          Documents
-        </TabsTrigger>
-        <TabsTrigger
-          value={StudioTabs.FORMS}
-          onClick={() => onTabClick(StudioTabs.FORMS)}
-        >
-          Forms
-        </TabsTrigger>
-      </TabsList>
+    <TabsList className="grid w-full grid-cols-4">
+      <TabsTrigger
+        value={StudioTabs.ACTIVE_QUEUES}
+        onClick={() => onTabClick(StudioTabs.ACTIVE_QUEUES)}
+      >
+        Active Queues
+      </TabsTrigger>
+      <TabsTrigger
+        value={StudioTabs.COMMISSION_TYPES}
+        onClick={() => onTabClick(StudioTabs.COMMISSION_TYPES)}
+      >
+        Commission Types
+      </TabsTrigger>
+      <TabsTrigger
+        value={StudioTabs.DOCUMENTS}
+        onClick={() => onTabClick(StudioTabs.DOCUMENTS)}
+      >
+        Documents
+      </TabsTrigger>
+      <TabsTrigger
+        value={StudioTabs.FORMS}
+        onClick={() => onTabClick(StudioTabs.FORMS)}
+      >
+        Forms
+      </TabsTrigger>
     </TabsList>
   );
 };

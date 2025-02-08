@@ -7,6 +7,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
+import { cn } from "@/lib/utils";
 
 export type ActionButtonOptionConfigType = {
   label: string;
@@ -25,6 +26,7 @@ export const ActionButton = ({
   defaultAction,
   options,
   defaultLabel = "Select Action",
+  className,
   ...buttonProps
 }: ActionButtonProps) => {
   const [selectedAction, setSelectedAction] = useState(
@@ -41,12 +43,22 @@ export const ActionButton = ({
 
   return (
     <div className="flex flex-row items-center">
-      <Button onClick={handleOnClick} {...buttonProps}>
+      <Button
+        onClick={handleOnClick}
+        className={cn(
+          "rounded-tl-md rounded-bl-md rounded-tr-none rounded-br-none pl-2 pr-1",
+          className
+        )}
+        {...buttonProps}
+      >
         {selectedAction ? selectedAction.label : defaultLabel}
       </Button>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="outline" className="px-2">
+          <Button
+            className="px-2 rounded-tl-none rounded-bl-none rounded-tr-md rounded-br-md"
+            {...buttonProps}
+          >
             ▼
           </Button>
         </DropdownMenuTrigger>

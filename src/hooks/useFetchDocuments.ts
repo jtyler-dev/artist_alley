@@ -19,7 +19,7 @@ export function useFetchDocuments({
   sortField = DEFAULT_SORT_FIELD,
   sortOrder = DEFAULT_SORT_ORDER,
 }: UseFetchDocumentsProps) {
-  const [documents, setDocuments] = useState<Document[]>([]);
+  const [documents, setDocuments] = useState<Document[]>();
   const [paginationCursor, setPaginationCursor] = useState<string | undefined>(
     undefined
   );
@@ -27,7 +27,7 @@ export function useFetchDocuments({
   const [totalCount, setTotalCount] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const hasMore = totalCount === null || documents.length < totalCount;
+  const hasMore = totalCount === null || (documents?.length ?? 0) < totalCount;
 
   const fetchDocuments = useCallback(
     async (resetData = false) => {
@@ -55,7 +55,7 @@ export function useFetchDocuments({
           setTotalCount(fetchedTotalCount);
         } else {
           setDocuments((prevDocuments) => [
-            ...prevDocuments,
+            ...(prevDocuments ?? []),
             ...fetchedDocuments,
           ]);
         }

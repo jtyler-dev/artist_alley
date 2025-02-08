@@ -31,11 +31,14 @@ enum CommissionStatus {
 
 enum FormFieldType {
   TEXT         
-  CHECKBOX     
-  RADIO         
-  MULTI_SELECT  
-  NUMBER        
-  DATE         
+  TEXTAREA
+  RADIO
+  CHECKBOX
+  SELECT
+  MULTI_SELECT
+  DATE
+  NUMBER   
+  FILE     
 }
 
 enum PublishedStatus {

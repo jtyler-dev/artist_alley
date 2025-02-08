@@ -4,6 +4,7 @@ import { cn } from "@/lib/utils";
 export interface SpinnerProps {
   "data-test"?: string;
   size?: "sm" | "md" | "lg" | "xl";
+  className?: string;
 }
 
 const sizeClasses = {
@@ -16,9 +17,10 @@ const sizeClasses = {
 export const Spinner = ({
   size = "md",
   "data-test": dataTest,
+  className,
 }: SpinnerProps) => {
   return (
-    <div role="status" data-test={dataTest}>
+    <div role="status" data-test={dataTest} className={cn("flex", className)}>
       <svg
         aria-hidden="true"
         className={cn(
