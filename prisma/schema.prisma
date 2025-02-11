@@ -38,7 +38,8 @@ enum FormFieldType {
   MULTI_SELECT
   DATE
   NUMBER   
-  FILE     
+  FILE    
+  TIME 
 }
 
 enum PublishedStatus {
@@ -407,9 +408,10 @@ model FormField {
 
   order       Int
   isRequired  Boolean @default(false) @map("is_required")
-  label       String  // label or question for the form field ie: "What is your name?"
+  question       String  // label or question for the form field ie: "What is your name?"
+  description    String? // description of the form field
   type        FormFieldType
-  options     String? @default("[]") // options for the form field, only used for radio, checkbox, and multi-select
+  options     String[] // options for the form field, only used for radio, checkbox, and multi-select
 
   responses  FormResponse[]
   @@map("form_field")
