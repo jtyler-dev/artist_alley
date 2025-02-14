@@ -35,7 +35,7 @@ enum FormFieldType {
   RADIO
   CHECKBOX
   SELECT
-  MULTI_SELECT
+  MULTI_SELECT // maybe remove this
   DATE
   NUMBER   
   FILE    
@@ -408,10 +408,13 @@ model FormField {
 
   order       Int
   isRequired  Boolean @default(false) @map("is_required")
-  question       String  // label or question for the form field ie: "What is your name?"
-  description    String? // description of the form field
+  question    String  // label or question for the form field ie: "What is your name?"
+  description String? // description of the form field
   type        FormFieldType
-  options     String[] // options for the form field, only used for radio, checkbox, and multi-select
+
+  // options for the form field, only used for radio, checkbox, and multi-select
+  // format will be something like {type: STRING | OTHER , value: string}
+  options     Json
 
   responses  FormResponse[]
   @@map("form_field")

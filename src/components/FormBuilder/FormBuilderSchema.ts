@@ -1,6 +1,8 @@
 import z from "zod";
 import { FormFieldType } from "@prisma/client";
 
+// update UpdateFieldType if this changes, since its used in the FormBuilderAction
+// to update the active form field information
 export const FormFieldSchema = z
   .object({
     id: z.string(),

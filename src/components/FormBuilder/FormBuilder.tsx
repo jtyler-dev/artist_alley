@@ -1,8 +1,7 @@
 "use client";
-import React, { useRef, useActionState, useState } from "react";
+import React, { useRef, useActionState } from "react";
 import { DndContext, closestCenter, DragEndEvent } from "@dnd-kit/core";
-import { SortableContext, arrayMove, useSortable } from "@dnd-kit/sortable";
-import { CSS } from "@dnd-kit/utilities";
+import { SortableContext, arrayMove } from "@dnd-kit/sortable";
 import {
   Form,
   FormControl,
@@ -25,6 +24,7 @@ import { v4 as uuidv4 } from "uuid";
 import { FormFieldType } from "@prisma/client";
 import z from "zod";
 import { SortableFormItem } from "./SortableFormItem";
+import { UpdateFieldType } from "./types";
 
 export interface FormBuilderProps {
   defaultValues?: FormBuilderSchemaType;
@@ -64,7 +64,7 @@ export const FormBuilder = ({
       ...fields,
       {
         id: uuidv4(),
-        label: "",
+        question: "",
         type,
         options: [],
         isRequired: false,
@@ -86,6 +86,13 @@ export const FormBuilder = ({
 
     const newFields = arrayMove(fields, oldIndex, newIndex);
     form.setValue("fields", newFields);
+  };
+
+  const onFieldUpdate = (fieldId: string, fieldUpdates: UpdateFieldType) => {
+    form.setValue(
+      "fields",
+      fields.map((f) => (f.id === fieldId ? { ...f, ...fieldUpdates } : f))
+    );
   };
 
   return (
@@ -125,24 +132,14 @@ export const FormBuilder = ({
           onDragEnd={handleDragEnd}
         >
           <SortableContext items={fields.map((f) => f.id)}>
-            {fields.map((field, index) => {
-              return <SortableFormItem key={field.id} field={field} />;
-              // // return (
-              // //   <FormField
-              // //     key={field.id}
-              // //     control={form.control}
-              // //     name={`fields.${index}.label`}
-              // //     render={({ field }) => (
-              // //       <FormItem>
-              // //         <FormLabel>Field Label</FormLabel>
-              // //         <FormControl>
-              // //           <Input {...field} />
-              // //         </FormControl>
-              // //         <FormMessage />
-              // //       </FormItem>
-              // //     )}
-              // //   />
-              // );
+            {fields.map((field) => {
+              return (
+                <SortableFormItem
+                  key={field.id}
+                  field={field}
+                  onChange={onFieldUpdate}
+                />
+              );
             })}
           </SortableContext>
         </DndContext>

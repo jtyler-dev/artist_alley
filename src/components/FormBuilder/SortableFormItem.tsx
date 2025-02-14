@@ -12,11 +12,13 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { Switch } from "@/components/ui/switch";
 import { Input } from "@/components/ui/input";
-
+import { FormFieldSelect } from "./FormFieldSelect";
+import { UpdateFieldType } from "./types";
 export interface SortableFormItemProps {
   field: FormFieldSchemaType;
-  onChange?: React.ChangeEventHandler<HTMLInputElement>;
+  onChange: (id: string, update: UpdateFieldType) => void;
 }
 
 export const SortableFormItem = ({
@@ -35,7 +37,12 @@ export const SortableFormItem = ({
 
   return (
     <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
-      test
+      <FormFieldSelect
+        defaultValue={field.type}
+        onChange={(selectedType) => onChange(field.id, { type: selectedType })}
+      />
+
+      <div>type: {field.type}</div>
     </div>
   );
 };
