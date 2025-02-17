@@ -8,9 +8,9 @@ export const metadata: Metadata = {
 
 export default function NewFormPage() {
   return (
-    <div>
+    <>
       <h1>New Form</h1>
       <FormBuilder />
-    </div>
+    </>
   );
 }

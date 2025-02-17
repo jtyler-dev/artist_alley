@@ -47,10 +47,19 @@ export const FormFieldSchema = z
     }
   );
 
+export const FormSectionSchema = z.object({
+  id: z.string(),
+  title: z.string().min(1, "Section title is required"),
+  description: z.string().optional(),
+  fields: z.array(FormFieldSchema).min(1, "At least one field is required"),
+});
+
 export const FormBuilderSchema = z.object({
   title: z.string().min(1, "Title is required"),
   description: z.string().optional(),
-  fields: z.array(FormFieldSchema).min(1, "At least one field is required"),
+  sections: z
+    .array(FormSectionSchema)
+    .min(1, "At least one section is required"),
 });
 
 export type FormBuilderSchemaType = z.infer<typeof FormBuilderSchema>;

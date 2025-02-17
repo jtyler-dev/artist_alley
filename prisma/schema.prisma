@@ -1,3 +1,4 @@
+// TODO: split this into multiple files
 generator client {
   provider = "prisma-client-js"
 }
@@ -30,12 +31,13 @@ enum CommissionStatus {
 }
 
 enum FormFieldType {
+  DOCUMENT
   TEXT         
   TEXTAREA
   RADIO
   CHECKBOX
   SELECT
-  MULTI_SELECT // maybe remove this
+  MULTI_SELECT
   DATE
   NUMBER   
   FILE    
@@ -79,9 +81,12 @@ model User {
   followers    Follower[]    @relation("UserFollowers")
   following    Follower[]    @relation("UserFollowing")
 
-  // documents tha the user has created
+  // documents that the user has created
   documents    Document[]
+
+  // forms that the user has created
   forms        Form[]
+  formSections FormSection[]
   formFields   FormField[]
 
   // commission creation things
@@ -195,6 +200,10 @@ model Document {
   userId      String
   user        User     @relation(fields: [userId], references: [id])
 
+  // version of the document
+  version     Int
+  isActive    Boolean @default(true) @map("is_active")
+
   // metadata for a document
   status      PublishedStatus @default(DRAFT)
   // name of the document
@@ -207,6 +216,15 @@ model Document {
   // if its a json object then it will be rich content
   content     String?
 
+  // what form fields are referencing this document
+  formFields FormField[] 
+
+  // Ensures each version of a document is unique
+  // the idea here is that if a document is being using by a form field (or anything else that requires a user to agree to after reading)
+  // we want to make sure that there is a copy of of the document the user agreed to
+  // if the document is in use and then updated, we will create a new version of the document and set that as active.
+  // if the document isnt in use (in a way where the user has to agree to something) then we can just update the document freely
+  @@unique([name, version]) 
   @@map("document")
 }
 
@@ -386,11 +404,32 @@ model Form {
 
   explanation String?
 
-  // attached fields to the form
-  formFields  FormField[]
+  // sections of the form
+  formSections FormSection[]
 
   // commission types that this form is attached to
   commissionTypes CommissionType[]
+}
+
+model FormSection {
+  id        String    @id @default(cuid())
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  // author of the form
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+
+  formId    String
+  form      Form     @relation(fields: [formId], references: [id])
+
+  // metadata for a form section
+  name        String
+  description String?
+  order     Int 
+
+  formFields FormField[]
 }
 
 model FormField {
@@ -403,8 +442,9 @@ model FormField {
   userId      String
   user        User     @relation(fields: [userId], references: [id])
 
-  formId      String
-  form        Form     @relation(fields: [formId], references: [id])
+  // what section the form field is in
+  formSectionId      String
+  formSection        FormSection     @relation(fields: [formSectionId], references: [id])
 
   order       Int
   isRequired  Boolean @default(false) @map("is_required")
@@ -415,6 +455,17 @@ model FormField {
   // options for the form field, only used for radio, checkbox, and multi-select
   // format will be something like {type: STRING | OTHER , value: string}
   options     Json
+
+  // if the form field is a document, then this will be the document id
+  // that we should use to get the document
+  documentId  String? @map("document_id")
+  document    Document? @relation(fields: [documentId], references: [id])
+
+  // validation rules for things in the form field; ie: min length, max length, etc
+  validationRules Json[] @map("validation_rules")
+
+  // logic for where the user will go next based on the response to the question
+  conditionalLogic Json[] @map("conditional_logic")
 
   responses  FormResponse[]
   @@map("form_field")
@@ -440,7 +491,6 @@ model FormResponse {
   // response to the form field
   value       String
 }
-
 
 model CustomReaction {
   id        String    @id @default(cuid())
